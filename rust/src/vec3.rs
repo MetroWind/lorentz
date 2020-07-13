@@ -182,6 +182,19 @@ impl Vec3
             }
         }
     }
+
+    pub fn randInUnitDisk() -> Vec3
+    {
+        loop
+        {
+            let p = 2.0 * Vec3::new(rand::random(), rand::random(), 0.0) -
+                Vec3::new(1.0, 1.0, 0.0);
+            if p.normSquared() < 1.0
+            {
+                return p;
+            }
+        }
+    }
 }
 
 impl ops::Index<usize> for Vec3

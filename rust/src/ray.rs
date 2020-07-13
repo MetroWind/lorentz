@@ -1,6 +1,5 @@
 use crate::vec3::Vec3;
 use crate::config::Float;
-use crate::material::Material;
 
 // origin + dir * t
 pub struct Ray

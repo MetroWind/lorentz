@@ -1,3 +1,4 @@
+use crate::rand;
 use crate::config::Float;
 use crate::vec3;
 use vec3::{Vec3, Color};
@@ -44,7 +45,36 @@ pub struct Lambertian
 
 impl Material for Lambertian
 {
-    fn scatter(&self, r_in: &Ray, hit: &Hit) -> Option<(Ray, Vec3)>
+    fn scatter(&self, _r_in: &Ray, hit: &Hit) -> Option<(Ray, Vec3)>
+    {
+        let target = hit.p + hit.normal + Vec3::randInUnitSphere();
+        Some((Ray { origin: hit.p, dir: target - hit.p }, self.albedo))
+    }
+}
+
+pub struct LambertianRandomColor
+{
+    albedo: Vec3,
+}
+
+impl LambertianRandomColor
+{
+    fn randomColor() -> Color
+    {
+        Color::new(rand::random::<Float>() * 0.6 + 0.1,
+                   rand::random::<Float>() * 0.6 + 0.1,
+                   rand::random::<Float>() * 0.6 + 0.1)
+    }
+
+    pub fn new() -> Self
+    {
+        Self { albedo: Self::randomColor() }
+    }
+}
+
+impl Material for LambertianRandomColor
+{
+    fn scatter(&self, _r_in: &Ray, hit: &Hit) -> Option<(Ray, Vec3)>
     {
         let target = hit.p + hit.normal + Vec3::randInUnitSphere();
         Some((Ray { origin: hit.p, dir: target - hit.p }, self.albedo))
@@ -88,10 +118,10 @@ impl Material for Glass
 {
     fn scatter(&self, r_in: &Ray, hit: &Hit) -> Option<(Ray, Vec3)>
     {
-        let mut ref_normal = Vec3::origin();
-        let mut ni_over_nt: Float = 0.0;
+        let ref_normal: Vec3;
+        let ni_over_nt: Float;
         let attenuation = Vec3::new(1.0, 1.0, 1.0);
-        let mut cos: Float;
+        let cos: Float;
 
         if vec3::dot(&r_in.dir, &hit.normal) > 0.0
         {
@@ -106,7 +136,7 @@ impl Material for Glass
             cos = -vec3::dot(&r_in.dir, &hit.normal) / r_in.dir.norm();
         }
 
-        let mut reflect_prob = schlick(cos, self.ref_index);
+        let reflect_prob = schlick(cos, self.ref_index);
         if let Some(refracted) = refract(&r_in.dir, &ref_normal, ni_over_nt)
         {
             if rand::random::<Float>() < reflect_prob
@@ -131,10 +161,10 @@ pub struct Null {}
 
 impl Material for Null
 {
-    fn scatter(&self, r_in: &Ray, hit: &Hit) -> Option<(Ray, Vec3)>
+    fn scatter(&self, _r_in: &Ray, _hit: &Hit) -> Option<(Ray, Vec3)>
     {
         None
     }
 }
 
-pub static NULL: Null = Null{};
+// pub static NULL: Null = Null{};
