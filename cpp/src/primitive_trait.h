@@ -9,6 +9,7 @@
 #include "config.h"
 #include "ray.h"
 #include "vec3.h"
+#include "material.h"
 
 namespace lorentz
 {
@@ -31,6 +32,7 @@ namespace lorentz
         virtual ~Primitive() {}
         virtual std::optional<Hit> intersect(
             const Ray& r, const Float t_min, const Float t_max) const = 0;
+        MaterialPtr material = nullptr;
     };
 
     class BoundedPrimitive : public Primitive
@@ -40,6 +42,7 @@ namespace lorentz
         virtual BBox bbox() const = 0;
     };
 
+    using PrimitivePtr = std::shared_ptr<Primitive>;
     using BoundedPrimitivePtr = std::shared_ptr<BoundedPrimitive>;
 
 }

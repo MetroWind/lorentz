@@ -20,6 +20,8 @@ namespace lorentz
     {
     public:
         bool isLeaf() const { return obj != nullptr; }
+
+        // Look ma, I’m using C++20!
         static BvhNodePtr build(std::span<BoundedPrimitivePtr> prims);
 
         virtual std::optional<Hit> intersect(

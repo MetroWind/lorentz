@@ -39,6 +39,11 @@ set(TheFiles
   src/bvh.cpp
   src/camera.h
   src/camera.cpp
+  src/scene.h
+  src/ref_scene_1.h
+  src/ref_scene_1.cpp
+  src/tracer.h
+  src/tracer.cpp
   )
 
 add_executable(lorentz src/main.cpp ${TheFiles})

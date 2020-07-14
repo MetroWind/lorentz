@@ -5,13 +5,15 @@
 #include "vec3.h"
 #include "primitive_trait.h"
 #include "material.h"
+#include "bvh.h"
 
 namespace lorentz
 {
     class Sphere: public BoundedPrimitive
     {
     public:
-        Sphere(const Vec3& c, const Float r);
+        Sphere(const Sphere&) = default;
+        Sphere(const Vec3& c, const Float r): center(c), radius(r) {}
         virtual ~Sphere() override {}
 
         virtual std::optional<Hit> intersect(
@@ -21,13 +23,12 @@ namespace lorentz
     private:
         Vec3 center;
         Float radius;
-        Material* material;
     };
 
     class InfinitePlane: public Primitive
     {
     public:
-        InfinitePlane(const Vec3& o, const Vec3 n);
+        InfinitePlane(const Vec3& o, const Vec3& n): origin(o), normal(n) {}
         virtual ~InfinitePlane() override {}
 
         virtual std::optional<Hit> intersect(
@@ -36,8 +37,29 @@ namespace lorentz
     private:
         Vec3 origin;
         Vec3 normal;
-        Material* material;
     };
+
+    class PrimitiveList: public Primitive
+    {
+    public:
+        PrimitiveList() = default;
+        PrimitiveList(PrimitiveList&& rhs) = default;
+        PrimitiveList& operator=(PrimitiveList&&) = default;
+        virtual ~PrimitiveList() override {}
+
+        virtual std::optional<Hit> intersect(
+            const Ray& r, const Float t_min, const Float t_max) const override;
+
+        void buildBvh() { bvh_tree = BvhNode::build(bounded); }
+
+        std::vector<BoundedPrimitivePtr> bounded;
+        std::vector<PrimitivePtr> unbounded;
+        bool use_bvh = true;
+
+    private:
+        BvhNodePtr bvh_tree;
+    };
+
 
 } // namespace lorentz
 

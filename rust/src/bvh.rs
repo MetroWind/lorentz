@@ -6,9 +6,9 @@ use crate::config::Float;
 use crate::ray::{Ray, Hit};
 use crate::primitive_traits::{Primitive, BBox, BoundedPrimitive};
 
-pub static mut node_inter_count_true: usize = 0;
-pub static mut node_inter_count_false: usize = 0;
-pub static mut obj_inter_count: usize = 0;
+// pub static mut node_inter_count_true: usize = 0;
+// pub static mut node_inter_count_false: usize = 0;
+// pub static mut obj_inter_count: usize = 0;
 
 struct BvhBranch
 {
@@ -71,24 +71,24 @@ impl Primitive for BvhNode
     {
         if !self.bounding_box.hit(r, t_min, t_max)
         {
-            unsafe
-            {
-                node_inter_count_false += 1;
-            }
+            // unsafe
+            // {
+            //     node_inter_count_false += 1;
+            // }
             return None;
         }
-        unsafe
-        {
-            node_inter_count_true += 1;
-        }
+        // unsafe
+        // {
+        //     node_inter_count_true += 1;
+        // }
         match &self.data
         {
             BvhData::Leaf(leaf) =>
             {
-                unsafe
-                {
-                    obj_inter_count += 1;
-                }
+                // unsafe
+                // {
+                //     obj_inter_count += 1;
+                // }
                 leaf.obj.intersect(r, t_min, t_max)
             },
             BvhData::Branch(branch) =>

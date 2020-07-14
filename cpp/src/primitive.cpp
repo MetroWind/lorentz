@@ -27,7 +27,7 @@ namespace lorentz
             }
 
             auto p = r.at(temp);
-            return Hit{ temp, p, (p - center) / radius, material};
+            return Hit{ temp, p, (p - center) / radius, material.get()};
         }
         return std::nullopt;
     }
@@ -50,12 +50,52 @@ namespace lorentz
         auto t = Vec3::dot(origin - r.origin, normal) / denomi;
         if(t < t_max && t > t_min)
         {
-            return Hit{ t, r.at(t), normal, material };
+            return Hit{ t, r.at(t), normal, material.get() };
         }
         else
         {
             return std::nullopt;
         }
+    }
+
+    std::optional<Hit> PrimitiveList :: intersect(
+        const Ray& r, const Float t_min, const Float t_max) const
+    {
+        Float closest = t_max;
+        std::optional<Hit> the_hit = std::nullopt;
+
+        if(use_bvh)
+        {
+            if(auto maybe_hit = bvh_tree->intersect(r, t_min, closest);
+               maybe_hit.has_value())
+            {
+                closest = maybe_hit -> t;
+                the_hit = std::move(*maybe_hit);
+            }
+        }
+        else
+        {
+            for(const auto& prim: bounded)
+            {
+                auto maybe_hit = prim -> intersect(r, t_min, closest);
+                if(maybe_hit.has_value())
+                {
+                    closest = maybe_hit -> t;
+                    the_hit = std::move(*maybe_hit);
+                }
+            }
+        }
+
+        for(const auto& prim: unbounded)
+        {
+            auto maybe_hit = prim -> intersect(r, t_min, closest);
+            if(maybe_hit.has_value())
+            {
+                closest = maybe_hit -> t;
+                the_hit = std::move(*maybe_hit);
+            }
+        }
+        return the_hit;
     }
 
 }

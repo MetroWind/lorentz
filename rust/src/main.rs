@@ -27,10 +27,10 @@ fn main()
         panic!("Failed to generate image");
     }
 
-    unsafe {
-        println!("node_inter_count_false: {}", bvh::node_inter_count_false);
-        println!("node_inter_count_true: {}", bvh::node_inter_count_true);
-        println!("obj_inter_count: {}", bvh::obj_inter_count);
-        println!("prim_inter_count: {}", primitive::prim_inter_count);
-    }
+    // unsafe {
+    //     println!("node_inter_count_false: {}", bvh::node_inter_count_false);
+    //     println!("node_inter_count_true: {}", bvh::node_inter_count_true);
+    //     println!("obj_inter_count: {}", bvh::obj_inter_count);
+    //     println!("prim_inter_count: {}", primitive::prim_inter_count);
+    // }
 }

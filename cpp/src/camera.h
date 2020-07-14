@@ -9,8 +9,7 @@ namespace lorentz
     class Camera
     {
     public:
-        Vec3 origin;
-
+        Camera() = default;
         Camera(const Vec3& look_from, const Vec3& look_at, const Vec3& vup,
                const Float vfov, const Float aspect, const Float aperture,
                const Float focus_distance);
@@ -18,6 +17,7 @@ namespace lorentz
         Ray ray(const Float s, const Float t) const;
 
     private:
+        Vec3 origin;
         Vec3 lower_left;
         Vec3 hori, vert;
         Float lens_radius;

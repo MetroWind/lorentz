@@ -48,7 +48,7 @@ namespace lorentz
 
     Color LambertianRandomColor :: randomColor() const
     {
-        return Color(random(0.1, 0.7), random(0.1, 0.7), random(0.1, 0.7));
+        return Color(random(0.1f, 0.7f), random(0.1f, 0.7f), random(0.1f, 0.7f));
     }
 
     std::optional<std::pair<Ray, Vec3>>

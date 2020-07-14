@@ -20,7 +20,7 @@ pub struct Sphere
     pub material: usize,
 }
 
-pub static mut prim_inter_count: usize = 0;
+// pub static mut prim_inter_count: usize = 0;
 
 impl Primitive for Sphere
 {
@@ -104,6 +104,7 @@ pub struct PrimitiveList
     bounded: Vec<Arc<dyn BoundedPrimitive + Send + Sync>>,
     unbounded: Vec<Arc<dyn Primitive + Send + Sync>>,
     bvh_tree: Arc<bvh::BvhNode>,
+    use_bvh: bool,
 }
 
 impl PrimitiveList
@@ -114,7 +115,8 @@ impl PrimitiveList
         let tree = Arc::new(bvh::BvhNode::new(&mut bounded[..]));
 
         Self {
-            bounded: bounded, unbounded: unbounded, bvh_tree: tree
+            bounded: bounded, unbounded: unbounded, bvh_tree: tree,
+            use_bvh: false,
         }
     }
 }
@@ -126,21 +128,26 @@ impl Primitive for PrimitiveList
         let mut closest: Float = t_max;
         let mut the_hit: Option<Hit> = None;
 
-        // if let Some(hit) = self.bvh_tree.intersect(r, t_min, closest)
-        // {
-        //     closest = hit.t;
-        //     the_hit = Some(hit);
-        // }
-
-        for prim in &self.bounded
+        if self.use_bvh
         {
-            unsafe {
-                prim_inter_count += 1;
-            }
-            if let Some(hit) = prim.intersect(r, t_min, closest)
+            if let Some(hit) = self.bvh_tree.intersect(r, t_min, closest)
             {
                 closest = hit.t;
                 the_hit = Some(hit);
+            }
+        }
+        else
+        {
+            for prim in &self.bounded
+            {
+                // unsafe {
+                //     prim_inter_count += 1;
+                // }
+                if let Some(hit) = prim.intersect(r, t_min, closest)
+                {
+                    closest = hit.t;
+                    the_hit = Some(hit);
+                }
             }
         }
         for prim in &self.unbounded
