@@ -54,7 +54,7 @@ namespace lorentz
 
         std::vector<BoundedPrimitivePtr> bounded;
         std::vector<PrimitivePtr> unbounded;
-        bool use_bvh = true;
+        bool use_bvh = false;
 
     private:
         BvhNodePtr bvh_tree;

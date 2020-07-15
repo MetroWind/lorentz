@@ -53,9 +53,9 @@ impl BvhNode
                 |a, b| { a.bbox().lower[ax].partial_cmp(&b.bbox().lower[ax]).unwrap() });
             let left = Arc::new(Self::new(&mut prims[0..len / 2]));
             let right = Arc::new(Self::new(&mut prims[len / 2..len]));
-            println!("Bounding box for node is \n\t{:?} +\n\t{:?} -->\n\t {:?}",
-                     left.bbox(), right.bbox(),
-                     left.bbox().union(&right.bbox()));
+            // println!("Bounding box for node is \n\t{:?} +\n\t{:?} -->\n\t {:?}",
+            //          left.bbox(), right.bbox(),
+            //          left.bbox().union(&right.bbox()));
             Self {
                 bounding_box: left.bbox().union(&right.bbox()),
                 data: BvhData::Branch(BvhBranch { left: left, right: right }),

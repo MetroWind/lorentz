@@ -66,7 +66,7 @@ namespace lorentz
         auto scene = ref_scene_1::buildScene(width, height);
 
         // Signal to noise ratio, in some arbitrary scale.
-        uint32_t snr_index = 3;
+        uint32_t snr_index = 2;
         // Number of samples per pixel.
         uint32_t ns = snr_index * snr_index;
 

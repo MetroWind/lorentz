@@ -29,9 +29,9 @@ namespace lorentz
             node -> left = build(prims.subspan(0, len / 2));
             node -> right = build(prims.subspan(len / 2, len - len / 2));
 
-            std::cout << "Bounding box for node is \n\t" << node->left->bbox()
-                      << "+\n\t" << node->right->bbox() << " ==> \n\t"
-                      << node->left->bbox().union_box(node->right->bbox()) << std::endl;
+            // std::cout << "Bounding box for node is \n\t" << node->left->bbox()
+            //           << "+\n\t" << node->right->bbox() << " ==> \n\t"
+            //           << node->left->bbox().union_box(node->right->bbox()) << std::endl;
 
             node -> bounding_box = node -> left -> bbox().union_box(
                 node -> right -> bbox());

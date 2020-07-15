@@ -6,6 +6,22 @@ namespace lorentz::ref_scene_1
 {
     namespace
     {
+        BoundedPrimitivePtr randomSphere()
+        {
+            const Float x = random(-5.0f, 5.0f);
+            const Float z = random(-6.0f, 4.0f);
+            const Float r = random(0.09f, 0.11f);
+            return std::make_shared<Sphere>(Vec3(x, -0.5f + r, z), r);
+        }
+
+        BoundedPrimitivePtr randomSmallSphere()
+        {
+            const Float x = random(-5.0f, 5.0f);
+            const Float z = random(-6.0f, 4.0f);
+            const Float r = random(0.02f, 0.025f);
+            return std::make_shared<Sphere>(Vec3(x, -0.5f + r, z), r);
+        }
+
         PrimitiveList buildPrimitives(
             const std::vector<MaterialPtr>& materials)
         {
@@ -19,16 +35,11 @@ namespace lorentz::ref_scene_1
             result.bounded.emplace_back(new Sphere(Vec3(-1.0f, 0.0f, -1.0f), 0.5f));
             result.bounded.back()->material = materials[1];
 
-            for(int i = 0; i < 20; i++)
+            for(int i = 0; i < 300; i++)
             {
-                Float x = -5.0f + 0.5f * i;
-                for(int j = 0; j < 20; j++)
-                {
-                    Float z = -5.0f + 0.5f * j;
-                    auto sphere = std::make_shared<Sphere>(Vec3(x, -0.4f, z), 0.1f);
-                    sphere -> material = materials[(i * 20 + j) % materials.size()];
-                    result.bounded.emplace_back(sphere);
-                }
+                auto sphere = randomSphere();
+                sphere->material = materials[random(0, materials.size()-1)];
+                result.bounded.emplace_back(sphere);
             }
 
             result.unbounded.emplace_back(

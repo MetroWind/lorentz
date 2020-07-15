@@ -107,7 +107,7 @@ pub fn render() -> RgbImage
     let scene = Arc::new(ref_scene_1::buildScene(width, height));
 
     // Signal to noise ratio, in some arbitrary scale.
-    let snr_index: u32 = 3;
+    let snr_index: u32 = 2;
     // Number of samples per pixel.
     let ns = snr_index * snr_index;
 

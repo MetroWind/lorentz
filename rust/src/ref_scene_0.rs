@@ -12,6 +12,30 @@ use crate::camera::Camera;
 use crate::scene::Scene;
 use crate::bvh::BvhNode;
 
+fn randomSphere() -> primitive::Sphere
+{
+    let x: Float = rand::random::<Float>() * 10.0 - 5.0;
+    let z: Float = rand::random::<Float>() * 10.0 - 6.0;
+    let r = rand::random::<Float>() * 0.02 + 0.09;
+    primitive::Sphere {
+        center: Vec3::new(x, -0.5 + r, z),
+        radius: r,
+        material: (rand::random::<Float>() * 17.0) as usize,
+    }
+}
+
+fn randomSmallSphere() -> primitive::Sphere
+{
+    let x: Float = rand::random::<Float>() * 10.0 - 5.0;
+    let z: Float = rand::random::<Float>() * 10.0 - 6.0;
+    let r = rand::random::<Float>() * 0.005 + 0.02;
+    primitive::Sphere {
+        center: Vec3::new(x, -0.5 + r, z),
+        radius: r,
+        material: (rand::random::<Float>() * 17.0) as usize,
+    }
+}
+
 fn buildPrimitives() -> PrimitiveList
 {
     let mut stuff: Vec<Arc<dyn BoundedPrimitive + Sync + Send>> = vec![
@@ -32,18 +56,9 @@ fn buildPrimitives() -> PrimitiveList
         }),
     ];
 
-    for i in 0..20
+    for _ in 0..300
     {
-        let x = -5.0 + 0.5 * (i as Float);
-        for j in 0..20
-        {
-            let z = -5.0 + 0.5 * (j as Float);
-            stuff.push(Arc::new(primitive::Sphere {
-                center: Vec3::new(x, -0.4, z),
-                radius: 0.1,
-                material: (i * 20 + j) % 17,
-            }));
-        }
+        stuff.push(Arc::new(randomSphere()));
     }
 
     PrimitiveList::new(stuff, vec![
