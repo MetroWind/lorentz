@@ -44,6 +44,8 @@ set(TheFiles
   src/ref_scene_1.cpp
   src/tracer.h
   src/tracer.cpp
+  src/tile.h
+  src/tile.cpp
   )
 
 add_executable(lorentz src/main.cpp ${TheFiles})

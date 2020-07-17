@@ -2,9 +2,7 @@ use std::sync::Arc;
 
 use crate::camera::Camera;
 use crate::primitive::{PrimitiveList};
-use crate::ray::{Ray, Hit};
 use crate::material;
-use crate::bvh::BvhNode;
 
 pub struct Scene
 {

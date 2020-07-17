@@ -3,6 +3,7 @@
 
 #include "tracer.h"
 #include "ref_scene_1.h"
+#include "tile.h"
 
 namespace lorentz
 {
@@ -48,6 +49,7 @@ namespace lorentz
             auto r = scene.camera.ray(u, v);
             col += renderRay(r, scene, 0);
         }
+
         col /= Float(ns);
 
         // Gamma correction. For now we’ll assume gamma = 2.2.
@@ -59,10 +61,28 @@ namespace lorentz
         return col;
     }
 
+    void renderTile(const Scene& scene, uint32_t ns, CanvasTile& tile)
+    {
+        tile.img.resize((tile.xrange[1] - tile.xrange[0]) *
+                        (tile.yrange[1] - tile.yrange[0]) * 3);
+        size_t i = 0;
+        for(uint32_t y = tile.yrange[0]; y < tile.yrange[1]; y++)
+        {
+            for(uint32_t x = tile.xrange[0]; x < tile.xrange[1]; x++)
+            {
+                const Color c = renderPixel(scene, ns, x, y);
+                tile.img[i++] = uint8_t(c[0] * COLOR_MAX);
+                tile.img[i++] = uint8_t(c[1] * COLOR_MAX);
+                tile.img[i++] = uint8_t(c[2] * COLOR_MAX);
+            }
+        }
+    }
+
     void render(const std::string& filename)
     {
-        uint32_t width = 800;
-        uint32_t height = 500;
+        const uint32_t width = 800;
+        const uint32_t height = 500;
+        const uint32_t tile_size = 64;
         auto scene = ref_scene_1::buildScene(width, height);
 
         // Signal to noise ratio, in some arbitrary scale.
@@ -70,16 +90,42 @@ namespace lorentz
         // Number of samples per pixel.
         uint32_t ns = snr_index * snr_index;
 
+        std::vector<uint8_t> img(width * height * 3);
+        TiledCanvas canvas(width, height, tile_size);
+
+        while(true)
+        {
+            auto tile = canvas.nextTile();
+            if(!tile)
+            {
+                break;
+            }
+            std::cout << "Rendering " << tile->tile_idx[0] << ", "
+                      << tile->tile_idx[1] << std::endl;
+            renderTile(scene, ns, *tile);
+            size_t i = 0;
+            for(uint32_t y = tile->yrange[0]; y < tile->yrange[1]; y++)
+            {
+                for(uint32_t x = tile->xrange[0]; x < tile->xrange[1]; x++)
+                {
+                    const size_t img_idx = (y * width + x) * 3;
+                    img[img_idx + 0] = tile->img[i + 0];
+                    img[img_idx + 1] = tile->img[i + 1];
+                    img[img_idx + 2] = tile->img[i + 2];
+                    i += 3;
+                }
+            }
+        }
+
         auto f = std::ofstream(filename.c_str());
         f << "P3\n" << width << " " << height << "\n255\n";
         for(uint32_t y = 0; y < height; y++)
         {
             for(uint32_t x = 0; x < width; x++)
             {
-                Color p = renderPixel(scene, ns, x, y);
-                f << int(p[0] * COLOR_MAX) << " "
-                  << int(p[1] * COLOR_MAX) << " "
-                  << int(p[2] * COLOR_MAX) << "\n";
+                f << int(img[(y * width + x) * 3]) << " "
+                  << int(img[(y * width + x) * 3 + 1]) << " "
+                  << int(img[(y * width + x) * 3 + 2]) << "\n";
             }
         }
         f.close();

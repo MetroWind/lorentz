@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use rand;
-
 use crate::config::Float;
 use crate::vec3::Vec3;
 use crate::primitive;
@@ -10,7 +8,6 @@ use crate::primitive::PrimitiveList;
 use crate::material;
 use crate::camera::Camera;
 use crate::scene::Scene;
-use crate::bvh::BvhNode;
 
 fn buildPrimitives() -> PrimitiveList
 {

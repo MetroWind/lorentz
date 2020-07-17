@@ -1,9 +1,8 @@
-use std::thread;
 use std::vec::Vec;
 use std::sync::{Arc, Mutex};
 
 use image::*;
-use rayon::prelude::*;
+use rayon;
 
 use crate::vec3::{Vec3, Color};
 use crate::config::Float;
@@ -107,27 +106,68 @@ pub fn render() -> RgbImage
     let scene = Arc::new(ref_scene_1::buildScene(width, height));
 
     // Signal to noise ratio, in some arbitrary scale.
-    let snr_index: u32 = 2;
+    let snr_index: u32 = 5;
     // Number of samples per pixel.
     let ns = snr_index * snr_index;
 
     let mut img: RgbImage = ImageBuffer::new(scene.width, scene.height);
     let canvas = TiledCanvas::new(scene.width, scene.height, 64);
-    let mut tiles: Mutex<Vec<CanvasTile>> = Mutex::new(Vec::new());
 
-    rayon::ThreadPoolBuilder::new().num_threads(1).build_global().unwrap();
+    // Method 1: Rust std thread, doesn’t work...
+    //
+    // let canvas = Mutex::new(canvas);
+    // let mut threads = vec![];
+    //
+    // for i in 0..8
+    // {
+    //     threads.push(thread::spawn(|| {
+    //         loop
+    //         {
+    //             if let Some(tile) = canvas.lock().unwrap().nextTile()
+    //             {
+    //                 println!("Rendering tile {:?}...", tile.tile_idx);
+    //                 let tile_img = renderTile(&scene, ns, &tile).img.unwrap();
+    //                 for y in tile.yrange.0..tile.yrange.1
+    //                 {
+    //                     for x in tile.xrange.0..tile.xrange.1
+    //                     {
+    //                         img.put_pixel(
+    //                             x, y, tile_img.get_pixel(
+    //                                 x - tile.xrange.0, y - tile.yrange.0).clone());
+    //                     }
+    //                 }
+    //             }
+    //             else
+    //             {
+    //                 break;
+    //             }
+    //         }
+    //     }));
+    // }
+    //
+    // for t in threads
+    // {
+    //     t.join();
+    // }
 
-    (0..canvas.tile_count_x * canvas.tile_count_y).into_par_iter().for_each(
-        |i| {
-            if let Some(tile) = canvas.at(i)
-            {
+    // Method 2: Rayon’s scoped thread pool.
+    //
+    let tile_count_x = canvas.tile_count_x;
+    let tile_count_y = canvas.tile_count_y;
+    let canvas = Mutex::new(canvas);
+    let tiles: Mutex<Vec<CanvasTile>> = Mutex::new(Vec::new());
+    let pool = rayon::ThreadPoolBuilder::new().num_threads(8).build().unwrap();
+    pool.scope(|s| {
+        for _ in 0..(tile_count_x * tile_count_y)
+        {
+            s.spawn(|_| {
+                let tile = canvas.lock().unwrap().nextTile().unwrap();
                 println!("Rendering tile {:?}...", tile.tile_idx);
-                // renderTile(&scene, ns, &tile, SubImage::<RgbImage>::new(img, 0, 0, 0, 0));
                 let tile_img = renderTile(&scene, ns, &tile);
                 let mut tiles = tiles.lock().unwrap();
                 tiles.push(tile_img);
-            }
-        });
+            });
+        }});
 
     for atile in tiles.into_inner().unwrap()
     {
@@ -142,6 +182,36 @@ pub fn render() -> RgbImage
             }
         }
     }
+
+    // Method 3: Rayon’s parallel iterator. This for some reason
+    // doesn’t render tiles in order.
+    //
+    // let tiles: Mutex<Vec<CanvasTile>> = Mutex::new(Vec::new());
+    // (0..canvas.tile_count_x * canvas.tile_count_y).into_par_iter().for_each(
+    //     |i| {
+    //         if let Some(tile) = canvas.at(i)
+    //         {
+    //             println!("Rendering tile {:?}...", tile.tile_idx);
+    //             // renderTile(&scene, ns, &tile, SubImage::<RgbImage>::new(img, 0, 0, 0, 0));
+    //             let tile_img = renderTile(&scene, ns, &tile);
+    //             let mut tiles = tiles.lock().unwrap();
+    //             tiles.push(tile_img);
+    //         }
+    //     });
+    //
+    // for atile in tiles.into_inner().unwrap()
+    // {
+    //     let tile_img = atile.img.unwrap();
+    //     for y in atile.yrange.0..atile.yrange.1
+    //     {
+    //         for x in atile.xrange.0..atile.xrange.1
+    //         {
+    //             let pix = tile_img.get_pixel(
+    //                 x - atile.xrange.0, y - atile.yrange.0).clone();
+    //             img.put_pixel(x, y, pix);
+    //         }
+    //     }
+    // }
 
     img
 }

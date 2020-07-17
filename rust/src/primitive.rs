@@ -1,10 +1,6 @@
 use std::vec::Vec;
 use std::sync::Arc;
 
-use std::fs::File;
-use std::io::prelude::*;
-use std::path::Path;
-
 use crate::vec3;
 use vec3::Vec3;
 use crate::config::Float;

@@ -5,6 +5,7 @@
 #include "ray.h"
 #include "scene.h"
 #include "ref_scene_1.h"
+#include "tile.h"
 
 namespace lorentz
 {
@@ -12,6 +13,7 @@ namespace lorentz
 
     Color renderRay(const Ray& r, const Scene& scene, uint32_t count);
     Color renderPixel(const Scene& scene, uint32_t ns, uint32_t x, uint32_t y);
+    void renderTile(const Scene& scene, uint32_t ns, CanvasTile& tile);
 
     void render(const std::string& filename);
 
