@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use crate::camera::Camera;
-use crate::primitive::{PrimitiveList};
+use super::camera::Camera;
+use crate::geometry::PrimitiveList;
 use crate::material;
 
 pub struct Scene

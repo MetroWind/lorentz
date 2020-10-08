@@ -1,13 +1,14 @@
 use std::vec::Vec;
 use std::sync::Arc;
 
-use crate::vec3;
+use super::vec3;
 use vec3::Vec3;
 use crate::config::Float;
-use crate::ray::{Ray,Hit};
-use crate::primitive_traits::{Primitive, BBox, BoundedPrimitive};
-use crate::bvh;
+use super::ray::{Ray,Hit};
+use super::primitive_traits::{Primitive, BBox, BoundedPrimitive};
+use super::bvh;
 
+/// A sphere with a center and a radius.
 #[derive(Clone, Copy, Debug)]
 pub struct Sphere
 {
@@ -64,6 +65,8 @@ impl BoundedPrimitive for Sphere
     }
 }
 
+/// An infinite plane denoted by a point on the plane, and a normal
+/// vector. Does not have a bounding box.
 #[derive(Clone, Copy, Debug)]
 pub struct InfinitePlane
 {
@@ -95,6 +98,7 @@ impl Primitive for InfinitePlane
     }
 }
 
+/// A collection of primitives.
 pub struct PrimitiveList
 {
     bounded: Vec<Arc<dyn BoundedPrimitive + Send + Sync>>,
@@ -105,6 +109,8 @@ pub struct PrimitiveList
 
 impl PrimitiveList
 {
+    /// Construct from a collection of bounded primitives and a
+    /// collection of unbounded primitives.
     pub fn new(mut bounded: Vec<Arc<dyn BoundedPrimitive + Send + Sync>>,
                unbounded: Vec<Arc<dyn Primitive + Send + Sync>>) -> Self
     {
@@ -117,8 +123,12 @@ impl PrimitiveList
     }
 }
 
+/// A `PrimitiveList` is also considered a primitive, in the sense
+/// that it can be hit by a ray.
 impl Primitive for PrimitiveList
 {
+    /// Return the hit by ray `r` at the nearest primitive (smallest
+    /// ray time).
     fn intersect(&self, r: &Ray, t_min: Float, t_max: Float) -> Option<Hit>
     {
         let mut closest: Float = t_max;
@@ -159,8 +169,12 @@ impl Primitive for PrimitiveList
     }
 }
 
+/// A `PrimitiveList` can also be consided bounded, if one only
+/// considers the bounded primitives contained.
 impl BoundedPrimitive for PrimitiveList
 {
+    /// Return the minimal bbox containing all the bounded primitives
+    /// in the collection.
     fn bbox(&self) -> BBox
     {
         let mut b = self.bounded[0].bbox();

@@ -1,7 +1,7 @@
-use crate::vec3;
-use crate::vec3::Vec3;
+use crate::geometry::vec3;
+use crate::geometry::Vec3;
 use crate::config::{Float, PI};
-use crate::ray::Ray;
+use crate::geometry::Ray;
 
 pub struct Camera
 {

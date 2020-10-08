@@ -1,8 +1,8 @@
 use crate::rand;
 use crate::config::Float;
-use crate::vec3;
-use vec3::{Vec3, Color};
-use crate::ray::{Ray,Hit};
+use crate::geometry::vec3;
+use crate::geometry::{Vec3, Color};
+use crate::geometry::{Ray,Hit};
 
 fn reflect(v_in: &Vec3, normal: &Vec3) -> Vec3
 {

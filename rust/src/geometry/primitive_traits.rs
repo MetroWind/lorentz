@@ -1,19 +1,24 @@
 use std::mem;
 
-use crate::vec3;
+use super::vec3;
 use vec3::Vec3;
 use crate::config::Float;
-use crate::ray::{Ray,Hit};
+use super::ray::{Ray,Hit};
 
+/// A frame-aligned bounding box.
 #[derive(Clone, Debug)]
 pub struct BBox
 {
+    /// The lower end of the diagonal of the bounding box.
     pub lower: Vec3,
+    /// The higher end of the diagonal of the bounding box.
     pub higher: Vec3,
 }
 
 impl BBox
 {
+    /// Return whether a ray `r` can intersect with the bounding box
+    /// between ray time `tmin` and `tmax`.
     pub fn hit(&self, r: &Ray, tmin: Float, tmax: Float) -> bool
     {
         for i in 0..3
@@ -34,6 +39,7 @@ impl BBox
         true
     }
 
+    /// Return the minimal bbox that can contain both this bbox and `rhs`.
     pub fn union(&self, rhs: &BBox) -> BBox
     {
         BBox {
@@ -50,12 +56,21 @@ impl BBox
 
 }
 
+/// All primitives should implement this trait.
 pub trait Primitive
 {
+    /// If the primitive can be hit by ray `r` between ray time
+    /// `t_min` and `t_max`, return the hit.
     fn intersect(&self, r: &Ray, t_min: Float, t_max: Float) -> Option<Hit>;
 }
 
+/// All primitives that have a bounding box should implement this
+/// trait.
+///
+/// An example of a primitive that does not have a bounding box
+/// is an infinte plane.
 pub trait BoundedPrimitive: Primitive
 {
+    /// Return the minimal bounding box of the primitive.
     fn bbox(&self) -> BBox;
 }

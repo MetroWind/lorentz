@@ -4,12 +4,25 @@ use rand;
 
 use crate::config::Float;
 
+/// A 3D vector, also used for position and (for now) color.
+///
+/// Some people prefer to have a seperate type for position, for type
+/// checking purposes. But I’m too lazy. This provides all the basic
+/// arithmatics for a 3D vector: `+`, `+=`, `-`, `-=`, `*`, `*=`, `/`,
+/// and `/=`. Obviously addition and subtraction are with another
+/// `Vec3` only. Multiplication can be with another `Vec3` or a float,
+/// in both directions. Division can be with another `Vec3` or a
+/// float, but the dividend must be a `Vec3`. These operations are
+/// always element-wise.
 #[derive(Clone, Copy, Debug)]
 pub struct Vec3
 {
+    /// The internal storage of the vector.
     pub data: [Float; 3],
 }
 
+/// Color is a 3-vector for now. We will change this if we need
+/// transparency.
 pub type Color = Vec3;
 
 impl ops::Add for Vec3
@@ -144,31 +157,37 @@ impl ops::Neg for Vec3
 
 impl Vec3
 {
+    /// Construct a new vector from coordinates.
     pub fn new(x: Float, y: Float, z: Float) -> Vec3
     {
         Vec3 { data: [x, y, z] }
     }
 
+    /// Construct a unit vector in the direction of `v`.
     pub fn unit(v: &Vec3) -> Vec3
     {
         *v / v.norm()
     }
 
+    /// Return the origin position (zero vector).
     pub fn origin() -> Vec3
     {
         Vec3::new(0.0, 0.0, 0.0)
     }
 
+    /// Return the norm of the vector.
     pub fn norm(&self) -> Float
     {
         (self[0] * self[0] + self[1] * self[1] + self[2] * self[2]).sqrt()
     }
 
+    /// Return |v|^2.
     pub fn normSquared(&self) -> Float
     {
         self[0] * self[0] + self[1] * self[1] + self[2] * self[2]
     }
 
+    /// Construct a random vector inside the unit sphere.
     pub fn randInUnitSphere() -> Vec3
     {
         let mut p: Vec3;
@@ -183,6 +202,7 @@ impl Vec3
         }
     }
 
+    /// Construct a random vector on the unit disk (z = 0).
     pub fn randInUnitDisk() -> Vec3
     {
         loop
@@ -215,11 +235,13 @@ impl ops::IndexMut<usize> for Vec3
     }
 }
 
+/// Dot product of two vectors.
 pub fn dot(lhs: &Vec3, rhs: &Vec3) -> Float
 {
     lhs[0] * rhs[0] + lhs[1] * rhs[1] + lhs[2] * rhs[2]
 }
 
+/// Cross product of two vectors.
 pub fn cross(lhs: &Vec3, rhs: &Vec3) -> Vec3
 {
     Vec3::new(lhs[1] * rhs[2] - lhs[2] * rhs[1],

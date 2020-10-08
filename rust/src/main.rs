@@ -7,21 +7,15 @@ extern crate rayon;
 use image::RgbImage;
 
 mod config;
-mod vec3;
-mod tracer;
-mod ray;
-mod primitive;
+mod geometry;
 mod material;
-mod camera;
 mod scene;
-mod tile;
-mod primitive_traits;
-mod bvh;
+mod render;
 mod ref_scene_1;
 
 fn main()
 {
-    let img: RgbImage = tracer::render();
+    let img: RgbImage = render::render();
     if img.save_with_format("test.png", image::ImageFormat::Png).is_err()
     {
         panic!("Failed to generate image");

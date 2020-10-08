@@ -1,28 +1,28 @@
 use std::sync::Arc;
 
 use crate::config::Float;
-use crate::vec3::Vec3;
-use crate::primitive;
-use crate::primitive_traits::BoundedPrimitive;
-use crate::primitive::PrimitiveList;
+use crate::geometry::Vec3;
+use crate::geometry;
+use crate::geometry::BoundedPrimitive;
+use crate::geometry::PrimitiveList;
 use crate::material;
-use crate::camera::Camera;
+use crate::scene::Camera;
 use crate::scene::Scene;
 
 fn buildPrimitives() -> PrimitiveList
 {
     let mut stuff: Vec<Arc<dyn BoundedPrimitive + Sync + Send>> = vec![
-         Arc::new(primitive::Sphere {
+         Arc::new(geometry::Sphere {
             center: Vec3::new(0.0, 0.0, -1.0),
             radius: 0.5,
             material: 0,
         }),
-        Arc::new(primitive::Sphere {
+        Arc::new(geometry::Sphere {
             center: Vec3::new(1.0, 0.0, -1.0),
             radius: 0.5,
             material: 3,
         }),
-        Arc::new(primitive::Sphere {
+        Arc::new(geometry::Sphere {
             center: Vec3::new(-1.0, 0.0, -1.0),
             radius: 0.5,
             material: 1,
@@ -35,7 +35,7 @@ fn buildPrimitives() -> PrimitiveList
         for j in 0..20
         {
             let z = -5.0 + 0.5 * (j as Float);
-            stuff.push(Arc::new(primitive::Sphere {
+            stuff.push(Arc::new(geometry::Sphere {
                 center: Vec3::new(x, -0.4, z),
                 radius: 0.1,
                 material: (i * 20 + j) % 17,
@@ -44,7 +44,7 @@ fn buildPrimitives() -> PrimitiveList
     }
 
     PrimitiveList::new(stuff, vec![
-        Arc::new(primitive::InfinitePlane {
+        Arc::new(geometry::InfinitePlane {
             origin: Vec3::new(0.0, -0.5, 0.0),
             normal: Vec3::new(0.0, 1.0, 0.0),
             material: 2,

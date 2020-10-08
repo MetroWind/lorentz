@@ -4,17 +4,16 @@ use std::sync::{Arc, Mutex};
 use image::*;
 use rayon;
 
-use crate::vec3::{Vec3, Color};
+use crate::geometry::{Vec3, Color};
 use crate::config::Float;
-use crate::ray::Ray;
+use crate::geometry::Ray;
 use crate::scene::Scene;
-use crate::primitive_traits::Primitive;
-use crate::tile::{TiledCanvas, CanvasTile};
+use crate::geometry::Primitive;
+use super::tile::{TiledCanvas, CanvasTile};
 
 use crate::ref_scene_1;
 
 static COLOR_MAX: Float = 255.999;
-
 
 // fn renderRay(r: &Ray, scene: &Scene) -> Color
 // {
@@ -56,10 +55,7 @@ fn renderRay(r: &Ray, scene: &Scene, count: u32) -> Color
     c
 }
 
-
-fn renderTile(scene: &Scene, ns: u32, tile: &crate::tile::CanvasTile) -> CanvasTile
-// fn renderTile(scene: &Scene, ns: u32, tile: &crate::tile::CanvasTile,
-//               img: SubImage<RgbImage>)
+fn renderTile(scene: &Scene, ns: u32, tile: &CanvasTile) -> CanvasTile
 {
     let mut img = RgbImage::new(tile.xrange.1 - tile.xrange.0,
                                 tile.yrange.1 - tile.yrange.0);
@@ -106,7 +102,7 @@ pub fn render() -> RgbImage
     let scene = Arc::new(ref_scene_1::buildScene(width, height));
 
     // Signal to noise ratio, in some arbitrary scale.
-    let snr_index: u32 = 5;
+    let snr_index: u32 = 10;
     // Number of samples per pixel.
     let ns = snr_index * snr_index;
 

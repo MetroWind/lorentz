@@ -3,8 +3,8 @@ use std::sync::Arc;
 use rand;
 
 use crate::config::Float;
-use crate::ray::{Ray, Hit};
-use crate::primitive_traits::{Primitive, BBox, BoundedPrimitive};
+use super::ray::{Ray, Hit};
+use super::primitive_traits::{Primitive, BBox, BoundedPrimitive};
 
 // pub static mut node_inter_count_true: usize = 0;
 // pub static mut node_inter_count_false: usize = 0;
