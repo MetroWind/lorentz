@@ -158,7 +158,7 @@ impl ops::Neg for Vec3
 impl Vec3
 {
     /// Construct a new vector from coordinates.
-    pub fn new(x: Float, y: Float, z: Float) -> Vec3
+    pub const fn new(x: Float, y: Float, z: Float) -> Vec3
     {
         Vec3 { data: [x, y, z] }
     }
@@ -170,7 +170,7 @@ impl Vec3
     }
 
     /// Return the origin position (zero vector).
-    pub fn origin() -> Vec3
+    pub const fn origin() -> Vec3
     {
         Vec3::new(0.0, 0.0, 0.0)
     }

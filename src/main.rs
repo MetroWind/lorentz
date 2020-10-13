@@ -4,8 +4,6 @@ extern crate image;
 extern crate rand;
 extern crate rayon;
 
-use image::RgbImage;
-
 mod config;
 mod geometry;
 mod material;
@@ -15,8 +13,13 @@ mod ref_scene_1;
 
 fn main()
 {
-    let img: RgbImage = render::render();
-    if img.save_with_format("test.png", image::ImageFormat::Png).is_err()
+    let img = render::render();
+    let width = img.width();
+    let height = img.height();
+
+    if image::save_buffer_with_format(
+        "test.png", &img.tonemap(), width, height,
+        image::ColorType::Rgb8, image::ImageFormat::Png).is_err()
     {
         panic!("Failed to generate image");
     }

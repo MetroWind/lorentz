@@ -1,39 +1,31 @@
-use image::RgbImage;
+use super::{RawImage, RawImageView};
 
-#[derive(Clone)]
-pub struct CanvasTile
+pub struct TiledCanvas<'a>
 {
-    pub tile_idx: (u32, u32),
-    pub xrange: (u32, u32),
-    pub yrange: (u32, u32),
-    pub img: Option<RgbImage>,
-}
-
-pub struct TiledCanvas
-{
-    width: u32,
-    height: u32,
+    img: &'a mut RawImage,
     pub tile_size: u32,
     pub tile_count_x: u32,
     pub tile_count_y: u32,
-    next_tile: u32,
 }
 
-impl TiledCanvas
+impl<'a> TiledCanvas<'a>
 {
-    pub fn new(width: u32, height: u32, tile_size: u32) -> Self
+    pub fn new(img: &'a mut RawImage, tile_size: u32) ->
+        Self
     {
+        let w = img.width();
+        let h = img.height();
         Self {
-            width: width, height: height, tile_size: tile_size,
-            tile_count_x: if width % tile_size == 0
-            { width / tile_size } else { width / tile_size + 1 },
-            tile_count_y: if height % tile_size == 0
-            { height / tile_size } else { height / tile_size + 1 },
-            next_tile: 0,
+            img: img,
+            tile_size: tile_size,
+            tile_count_x: if w % tile_size == 0
+            { w / tile_size } else { w / tile_size + 1 },
+            tile_count_y: if h % tile_size == 0
+            { h / tile_size } else { h / tile_size + 1 },
         }
     }
 
-    pub fn at(&self, i: u32) -> Option<CanvasTile>
+    fn at(&mut self, i: u32) -> Option<RawImageView>
     {
         if i >= self.tile_count_x * self.tile_count_y
         {
@@ -41,30 +33,36 @@ impl TiledCanvas
         }
         let tile_idx_y = i / self.tile_count_x;
         let tile_idx_x = i % self.tile_count_x;
-        let mut xrange = (tile_idx_x * self.tile_size,
-                          (tile_idx_x + 1) * self.tile_size);
-        if xrange.1 > self.width
+        let x = tile_idx_x * self.tile_size;
+        let mut width = self.tile_size;
+        if x + width > self.img.width()
         {
-            xrange.1 = self.width;
+            width = self.img.width() - x;
         }
-        let mut yrange = (tile_idx_y * self.tile_size,
-                          (tile_idx_y + 1) * self.tile_size);
-        if yrange.1 > self.height
+        let y = tile_idx_y * self.tile_size;
+        let mut height = self.tile_size;
+        if y + height > self.img.height()
         {
-            yrange.1 = self.height;
+            height = self.img.height() - y;
         }
-        Some(CanvasTile{ tile_idx: (tile_idx_x, tile_idx_y),
-                         xrange: xrange, yrange: yrange,
-                         img: None,})
+        Some(self.img.view(x, y, width, height))
     }
 
-    pub fn nextTile(&mut self) -> Option<CanvasTile>
+    pub fn tiles(&mut self) -> Vec<RawImageView>
     {
-        let t_maybe = self.at(self.next_tile);
-        if t_maybe.is_some()
+        let mut result = Vec::new();
+        let mut i = 0;
+        loop
         {
-            self.next_tile += 1;
+            if let Some(tile) = self.at(i)
+            {
+                result.push(tile);
+            }
+            else
+            {
+                return result;
+            }
+            i += 1;
         }
-        return t_maybe;
     }
 }
