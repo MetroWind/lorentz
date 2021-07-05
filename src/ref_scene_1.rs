@@ -59,13 +59,16 @@ pub fn buildScene(width: u32, height: u32) -> Scene
 
     let texs: Vec<Arc<dyn texture::Texture + Sync + Send>> = vec![
         Arc::new(texture::Constant::new(Color::new(0.7, 0.7, 0.2))),
-        Arc::new(texture::Constant::new(Color::new(0.5, 0.5, 0.5))),
+        Arc::new(texture::Checker::new(
+            Arc::new(texture::Constant::new(Color::new(0.7, 0.7, 0.7))),
+            Arc::new(texture::Constant::new(Color::new(0.2, 0.2, 0.2)))
+        )),
     ];
 
     let mut mats: Vec<Arc<dyn material::Material + Sync + Send>> = vec![
         Arc::new(material::Metal { albedo: Vec3::new(0.5, 0.5, 0.5), roughness: 0.0 }),
         Arc::new(material::Lambertian { albedo: texs[0].clone() }),
-        Arc::new(material::Lambertian { albedo: texs[1].clone() }),
+        Arc::new(material::Lambertian { albedo: texs[1].clone() }), // Floor
         Arc::new(material::Glass { ref_index: 1.5 }),
         Arc::new(material::Glass { ref_index: 1.7 }),
         Arc::new(material::Glass { ref_index: 1.7 }),
