@@ -3,6 +3,7 @@ use crate::config::Float;
 use crate::geometry::vec3;
 use crate::geometry::{Vec3, Color};
 use crate::geometry::{Ray,Hit};
+use crate::texture::{self, Texture, AnyTexture};
 
 fn reflect(v_in: &Vec3, normal: &Vec3) -> Vec3
 {
@@ -40,7 +41,7 @@ pub trait Material
 
 pub struct Lambertian
 {
-    pub albedo: Vec3,
+    pub albedo: AnyTexture,
 }
 
 impl Material for Lambertian
@@ -48,13 +49,14 @@ impl Material for Lambertian
     fn scatter(&self, _r_in: &Ray, hit: &Hit) -> Option<(Ray, Vec3)>
     {
         let target = hit.p + hit.normal + Vec3::randInUnitSphere();
-        Some((Ray { origin: hit.p, dir: target - hit.p }, self.albedo))
+        Some((Ray { origin: hit.p, dir: target - hit.p },
+              self.albedo.value(0.0, 0.0, &hit.p)))
     }
 }
 
 pub struct LambertianRandomColor
 {
-    albedo: Vec3,
+    albedo: texture::Constant,
 }
 
 impl LambertianRandomColor
@@ -68,7 +70,7 @@ impl LambertianRandomColor
 
     pub fn new() -> Self
     {
-        Self { albedo: Self::randomColor() }
+        Self { albedo: texture::Constant::new(Self::randomColor()) }
     }
 }
 
@@ -77,7 +79,8 @@ impl Material for LambertianRandomColor
     fn scatter(&self, _r_in: &Ray, hit: &Hit) -> Option<(Ray, Vec3)>
     {
         let target = hit.p + hit.normal + Vec3::randInUnitSphere();
-        Some((Ray { origin: hit.p, dir: target - hit.p }, self.albedo))
+        Some((Ray { origin: hit.p, dir: target - hit.p },
+              self.albedo.value(0.0, 0.0, &hit.p)))
     }
 }
 

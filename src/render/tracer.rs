@@ -74,7 +74,7 @@ pub fn render() -> RawImage
     // Number of samples per pixel.
     let ns = snr_index * snr_index;
 
-    let pool = rayon::ThreadPoolBuilder::new().num_threads(8).build().unwrap();
+    let pool = rayon::ThreadPoolBuilder::new().num_threads(24).build().unwrap();
     let mut img = RawImage::new(width, height);
     let mut canvas = TiledCanvas::new(&mut img, 64);
     let tiles = canvas.tiles();

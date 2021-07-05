@@ -1,11 +1,12 @@
 use std::sync::Arc;
 
 use crate::config::Float;
-use crate::geometry::Vec3;
+use crate::geometry::{Vec3, Color};
 use crate::geometry;
 use crate::geometry::BoundedPrimitive;
 use crate::geometry::PrimitiveList;
 use crate::material;
+use crate::texture;
 use crate::scene::Camera;
 use crate::scene::Scene;
 
@@ -56,10 +57,15 @@ pub fn buildScene(width: u32, height: u32) -> Scene
     let camera_pos = Vec3::new(3.5, 0.35, 1.0);
     let camera_lookat = Vec3::new(0.0, -0.4, -1.0);
 
+    let texs: Vec<Arc<dyn texture::Texture + Sync + Send>> = vec![
+        Arc::new(texture::Constant::new(Color::new(0.7, 0.7, 0.2))),
+        Arc::new(texture::Constant::new(Color::new(0.5, 0.5, 0.5))),
+    ];
+
     let mut mats: Vec<Arc<dyn material::Material + Sync + Send>> = vec![
         Arc::new(material::Metal { albedo: Vec3::new(0.5, 0.5, 0.5), roughness: 0.0 }),
-        Arc::new(material::Lambertian { albedo: Vec3::new(0.7, 0.7, 0.2) }),
-        Arc::new(material::Lambertian { albedo: Vec3::new(0.5, 0.5, 0.5) }),
+        Arc::new(material::Lambertian { albedo: texs[0].clone() }),
+        Arc::new(material::Lambertian { albedo: texs[1].clone() }),
         Arc::new(material::Glass { ref_index: 1.5 }),
         Arc::new(material::Glass { ref_index: 1.7 }),
         Arc::new(material::Glass { ref_index: 1.7 }),

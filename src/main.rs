@@ -6,6 +6,7 @@ extern crate rayon;
 
 mod config;
 mod geometry;
+mod texture;
 mod material;
 mod scene;
 mod render;
